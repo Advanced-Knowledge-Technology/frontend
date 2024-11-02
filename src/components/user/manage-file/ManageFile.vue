@@ -15,13 +15,13 @@
                         </select>
                     </div>
                     <div class="col-2 pl-0">
-                        <select id="file_sort_by" content="Sắp xếp theo" v-tippy class="form-control " v-model="big_search.order_by">
+                        <select id="file_sort_by" content="Order by" v-tippy class="form-control " v-model="big_search.order_by">
                             <option value="id">ID</option>
                             <option value="name">Name</option>
                         </select>
                     </div>
                     <div class="col-2 pl-0">
-                        <select id="file_sort_direction" content="Kiểu sắp xếp" v-tippy class="form-control " v-model="big_search.order_direction">
+                        <select id="file_sort_direction" content="Order direction" v-tippy class="form-control " v-model="big_search.order_direction">
                             <option value="asc">Ascending</option>
                             <option value="desc">Descending</option>
                         </select>
@@ -224,7 +224,6 @@ export default {
         getListFolder: async function () {
             try {
                 const { data } = await UserRequest.post('folder/')
-                console.log(data);
                 var data_folders = data;
                 data_folders.forEach((folder) => {
                     var option = { value: folder.id, label: `${folder.name}`}
@@ -232,8 +231,7 @@ export default {
                 });
             }
             catch (error) {
-                console.log(error);
-                this.$emitEvent('eventError', 'Error something !');
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
         getDataRecords: async function () {
@@ -250,16 +248,14 @@ export default {
                     order_direction : this.big_search.order_direction,
                     id_folder : this.big_search.id_folder
                 }
-                const { files, total, total_pages } = await UserRequest.post('file/', submit_search)
-                this.records = files;
-                console.log(files);
-                this.total = total;
-                this.last_page = total_pages;
+                const { data } = await UserRequest.post('file/', submit_search)
+                this.records = data.files;
+                this.total = data.total;
+                this.last_page = data.total_pages;
                 this.isLoading = false;
             }
             catch (error) {
-                console.log(error);
-                this.$emitEvent('eventError', error.messages[0]);
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
                 this.isLoading = false;
             }
             this.reRenderPaginate();

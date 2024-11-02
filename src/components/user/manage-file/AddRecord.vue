@@ -79,41 +79,34 @@ export default {
             this.record.file = event.target.files[0];
         },
         addRecord: async function () {
-            this.errors = {
-                id_folder: null,
-                file: null,
-            }
-            if(this.record.file === null) {
-                this.errors.file = 'File is required !'
-            } else if(this.record.id_folder === null) {
-                this.errors.id_folder = 'Folder selection is required !'
-            } else {
-                try {
-                    const formData = new FormData();
-                    for (let key in this.record) formData.append(key, this.record[key]);
+            try {
+                const formData = new FormData();
+                for (let key in this.record) formData.append(key, this.record[key]);
 
-                    await UserRequest.post('file/add/', formData, true);
-                    this.$emitEvent('eventSuccess', 'File added successfully !');
-                    var closePW = window.document.getElementById('addRecord');
-                    closePW.click();
-                    this.$refs.fileInput.value = '';
-                    this.record = {
-                        id_folder: null,
-                        file: null,
-                    };
-                    this.errors = {
-                        id_folder: null,
-                        file: null,
-                    }
-                    this.$emitEvent('eventRegetDataRecords', '');
-                }
-                catch (error) {
-                    this.errors.file = 'Error name.'
-                    console.log(error);
-                    this.$emitEvent('eventError', 'Error something !');
-                }
+                await UserRequest.post('file/add/', formData, true);
+                this.$emitEvent('eventSuccess', 'File added successfully !');
+                var closePW = window.document.getElementById('addRecord');
+                closePW.click();
+                this.$refs.fileInput.value = '';
+                this.reset();
+                this.$emitEvent('eventRegetDataRecords', '');
+            }
+            catch (error) {
+                if (error.errors) this.errors = error.errors;
+                else for (let key in this.errors) this.errors[key] = null;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
+        reset: function() {
+            this.record = {
+                name: '',
+                id_parent: null,
+            },
+            this.errors = {
+                name: null,
+                id_parent: null,
+            }
+        }
     },
     watch: {
 

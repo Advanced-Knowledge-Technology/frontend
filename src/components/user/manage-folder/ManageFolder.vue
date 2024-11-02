@@ -15,13 +15,13 @@
                         </select>
                     </div>
                     <div class="col-2 pl-0">
-                        <select id="folder_sort_by" content="Sắp xếp theo" v-tippy class="form-control " v-model="big_search.order_by">
+                        <select id="folder_sort_by" content="Order by" v-tippy class="form-control " v-model="big_search.order_by">
                             <option value="id">ID</option>
                             <option value="name">Name</option>
                         </select>
                     </div>
                     <div class="col-2 pl-0">
-                        <select id="folder_sort_direction" content="Kiểu sắp xếp" v-tippy class="form-control " v-model="big_search.order_direction">
+                        <select id="folder_sort_direction" content="Order direction" v-tippy class="form-control " v-model="big_search.order_direction">
                             <option value="asc">Ascending</option>
                             <option value="desc">Descending</option>
                         </select>
@@ -239,7 +239,6 @@ export default {
             // window.history.pushState({}, null, this.query);
             window.history.replaceState({}, null, this.query);
             try {
-
                 var submit_search = {
                     search : this.search,
                     page : this.big_search.page,
@@ -247,16 +246,14 @@ export default {
                     order_by : this.big_search.order_by,
                     order_direction : this.big_search.order_direction
                 }
-                const { folders, total, total_pages } = await UserRequest.post('folder/', submit_search)
-                this.records = folders;
-                console.log(folders);
-                this.total = total;
-                this.last_page = total_pages;
+                const { data } = await UserRequest.post('folder/', submit_search)
+                this.records = data.folders;
+                this.total = data.total;
+                this.last_page = data.total_pages;
                 this.isLoading = false;
             }
             catch (error) {
-                console.log(error);
-                this.$emitEvent('eventError', error.messages[0]);
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
                 this.isLoading = false;
             }
             this.reRenderPaginate();

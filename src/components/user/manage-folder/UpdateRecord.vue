@@ -82,30 +82,33 @@ export default {
     },
     methods: {
         updateRecord: async function () {
-            if(this.record.name === '') {
-                this.errors.name = 'Folder name cannot be empty !'
-            } else {
-                try {
-                    var dataSubmit = {
-                        id: this.record.id,
-                        name: this.record.name,
-                    }
-                    if(this.record.id_parent) dataSubmit.id_parent = this.record.id_parent;
+            try {
+                var dataSubmit = {
+                    id: this.record.id,
+                    name: this.record.name,
+                }
+                if(this.record.id_parent) dataSubmit.id_parent = this.record.id_parent;
 
-                    await UserRequest.put('folder/update/', dataSubmit, true);
-                    this.$emitEvent('eventSuccess', 'Folder updated successfully !');
-                    var closePW = window.document.getElementById('updateRecord');
-                    closePW.click();
-                    this.errors.name = null;
-                    this.$emitEvent('eventRegetDataRecords', '');
-                }
-                catch (error) {
-                    this.errors.name = 'Error name.'
-                    console.log(error);
-                    this.$emitEvent('eventError', 'Error something !');
-                }
+                await UserRequest.put('folder/update/', dataSubmit, true);
+                this.$emitEvent('eventSuccess', 'Folder updated successfully !');
+                var closePW = window.document.getElementById('updateRecord');
+                closePW.click();
+                this.reset();
+                this.$emitEvent('eventRegetDataRecords', '');
+            }
+            catch (error) {
+                if (error.errors) this.errors = error.errors;
+                else for (let key in this.errors) this.errors[key] = null;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
+        reset: function() {
+            this.errors = {
+                id: null,
+                name: null,
+                id_parent: null,
+            }
+        }
     },
     watch: {
 

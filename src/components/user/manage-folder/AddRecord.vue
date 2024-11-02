@@ -73,30 +73,34 @@ export default {
         Multiselect
     },
     computed: {
+
     },
     methods: {
         addRecord: async function () {
-            if(this.record.name === '') {
-                this.errors.name = 'Folder name cannot be empty !'
-            } else {
-                try {
-                    await UserRequest.post('folder/add/', this.record, true);
-                    this.$emitEvent('eventSuccess', 'Folder added successfully !');
-                    var closePW = window.document.getElementById('addRecord');
-                    closePW.click();
-                    this.record = {
-                        name: null,
-                    };
-                    this.errors.name = null;
-                    this.$emitEvent('eventRegetDataRecords', '');
-                }
-                catch (error) {
-                    this.errors.name = 'Error name.'
-                    console.log(error);
-                    this.$emitEvent('eventError', 'Error something !');
-                }
+            try {
+                await UserRequest.post('folder/add/', this.record, true);
+                this.$emitEvent('eventSuccess', 'Folder added successfully !');
+                var closePW = window.document.getElementById('addRecord');
+                closePW.click();
+                this.reset();
+                this.$emitEvent('eventRegetDataRecords', '');
+            }
+            catch (error) {
+                if (error.errors) this.errors = error.errors;
+                else for (let key in this.errors) this.errors[key] = null;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
+        reset: function() {
+            this.record = {
+                name: '',
+                id_parent: null,
+            },
+            this.errors = {
+                name: null,
+                id_parent: null,
+            }
+        }
     },
     watch: {
 

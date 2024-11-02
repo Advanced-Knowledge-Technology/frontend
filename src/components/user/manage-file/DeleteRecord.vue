@@ -51,15 +51,16 @@ export default {
     methods: {
         functionDeleteRecord: async function () {
             try {
-                await UserRequest.delete(`file/delete/?id=${this.recordSelected.id}`, true);
+                await UserRequest.delete(`file/delete/?id=${this.recordSelected.id}`, {}, true);
                 this.$emitEvent('eventSuccess', 'Folder deleted successfully !');
                 const closeButton = this.$refs.closeButton;
                 closeButton.click();
                 this.$emitEvent('eventRegetDataRecords', this.recordSelected.id);
             }
             catch (error) {
-                console.log(error);
-                this.$emitEvent('eventError', 'Error something !');
+                if (error.errors) this.errors = error.errors;
+                else for (let key in this.errors) this.errors[key] = null;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
     }
