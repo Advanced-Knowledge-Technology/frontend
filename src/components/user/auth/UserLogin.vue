@@ -12,11 +12,11 @@
 					<form @submit.prevent="login()">
 						<h4>Knowledge Login </h4><br>
 						<div class="input-form">
-							<input name="email" v-model="loginUser.email" required>
+							<input name="username" v-model="loginUser.username" required>
 							<div class="underline"></div>
-							<label><i class="fa-solid fa-envelope"></i> Email</label>
+							<label><i class="fa-solid fa-envelope"></i> Username</label>
 						</div>
-						<span v-if="errors.email" class="text-danger">{{ errors.email[0] }}</span>
+						<span v-if="errors.username" class="text-danger">{{ errors.username[0] }}</span>
 						<br>
 						<br>
 						<div class="input-form">
@@ -79,37 +79,23 @@ export default {
 		return {
 			user: {
 				id: null,
+				username: null,
 				email: null,
-				role: null,
-				line_user_id: null,
-				channel_id: null,
-				name: null,
-				phone: null,
-				avatar: null,
-				address: null,
-				gender: null,
-				date_of_birth: null,
-				is_block: null,
-				is_delete: null,
-				email_verified_at: null,
-				created_at: null,
-				updated_at: null,
-				expires_in: null,
-				token_type: null,
+				first_name: null,
+				last_name: null,
 				access_token: null,
+                role: null,
 			},
 			isShow: false,
 			loginUser: {
-				// email: '',
-				// password: ''
-				email: 'admin@gmail.com',
-				password: 'admin'
+				username: 'hello',
+				password: '123456'
 			},
 			resetPassword: {
 				email: ''
 			},
 			errors: {
-				email: null,
+				username: null,
 				password: null
 			}
 		}
@@ -122,62 +108,19 @@ export default {
 		appMain.style.paddingLeft = '0px'
 	},
 	methods: {
-		login: function () {
-
-			if(this.loginUser.email === 'admin@gmail.com' && this.loginUser.password === 'admin') {
-				this.user = {
-					id: 1,
-					email: "admin@gmail.com",
-					role: "admin",
-					line_user_id: "U1234567890abcdef",
-					channel_id: "C9876543210abcdef",
-					name: "Admin",
-					phone: "+1234567890",
-					avatar: null,
-					address: "123 Main St, Springfield, USA",
-					gender: "male",
-					date_of_birth: "1990-01-15",
-					is_block: false,
-					is_delete: false,
-					email_verified_at: "2024-10-01 12:00:00",
-					created_at: "2023-01-01 10:00:00",
-					updated_at: "2024-10-15 15:30:00",
-					expires_in: 3600,
-					token_type: "Bearer",
-					access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-				}
+		login: async function () {
+			try {
+				const { data, messages } = await  UserRequest.post('user/login/', this.loginUser, true)
+				this.user = data.user;
+				this.user.access_token = data.token.access;
 				window.localStorage.setItem('user', JSON.stringify(this.user));
-				emitEvent('eventSuccess', 'Log in successfully !');
-				this.$router.push({ name: 'ManageFile' }); 
-			}
-			else if (this.loginUser.email === 'user@gmail.com' && this.loginUser.password === 'user') {
-				this.user = {
-					id: 1,
-					email: "user@gmail.com",
-					role: "user",
-					line_user_id: "U1234567890abcdef",
-					channel_id: "C9876543210abcdef",
-					name: "User",
-					phone: "+1234567890",
-					avatar: null,
-					address: "123 Main St, Springfield, USA",
-					gender: "male",
-					date_of_birth: "1990-01-15",
-					is_block: false,
-					is_delete: false,
-					email_verified_at: "2024-10-01 12:00:00",
-					created_at: "2023-01-01 10:00:00",
-					updated_at: "2024-10-15 15:30:00",
-					expires_in: 3600,
-					token_type: "Bearer",
-					access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-				}
-				window.localStorage.setItem('user', JSON.stringify(this.user));
-				emitEvent('eventSuccess', 'Log in successfully !');
+				this.$emitEvent('eventSuccess', messages[0]);
 				this.$router.push({ name: 'SearchPage' }); 
 			}
-			else {
-				emitEvent('eventError', 'Login failed !');
+            catch (error) {
+                if (error.errors) this.errors = error.errors;
+                else for (let key in this.errors) this.errors[key] = null;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
 			}
 		},
 		userResetPassword: async function () {

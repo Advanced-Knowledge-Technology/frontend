@@ -67,7 +67,7 @@
           <img id="avatar_sidebar" :src="user.avatar ? user.avatar : require('@/assets/avatar.jpg')" alt="Avatar User">
           <div class="name_job">
             <!-- <div class="name">{{ user.name }}</div> -->
-            <div class="name">{{ user.name }}</div>
+            <div class="name">{{ user.first_name +' '+ user.last_name }}</div>
             <div class="job"><i class="fa-solid fa-user-tag"></i> {{ user.role === 'admin' ? 'Admin' : 'User' }}</div>
           </div>
         </div>
@@ -100,25 +100,13 @@ export default {
     return {
       isUserOpened: true,
       user: {
-        id: null,
-        email: null,
+				id: null,
+				username: null,
+				email: null,
+				first_name: null,
+				last_name: null,
+				access_token: null,
         role: null,
-        line_user_id: null,
-        channel_id: null,
-        name: null,
-        phone: null,
-        avatar: null,
-        address: null,
-        gender: null,
-        date_of_birth: null,
-        is_block: null,
-        is_delete: null,
-        email_verified_at: null,
-        created_at: null,
-        updated_at: null,
-        expires_in: null,
-        token_type: null,
-        access_token: null,
       },
     }
   },

@@ -70,7 +70,7 @@ const routes = [
             { path: 'manage-folder', name: 'ManageFolder', component: ManageFolder },
             { path: 'manage-file', name: 'ManageFile', component: ManageFile },
             { path: 'graph-database', name: 'GraphDatabase', component: GraphDatabase },
-            { path: 'search', name: 'SearchPage', component: SearchPage },
+            { path: 'chat-bot', name: 'SearchPage', component: SearchPage },
             // { path: 'manage-content', name: 'ManageContent', component: ManageContent },
             // { path: 'manage-broadcast', name: 'ManageBroadcast', component: ManageBroadcast },
             // { path: 'statistical-channel', name: 'StatisticalChannel', component: StatisticalChannel },

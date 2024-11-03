@@ -7,10 +7,16 @@
         </div>
         <div class="container-result">
             <div class="mt-2" id="result">
+                <div v-if="isLoadingHistory" class="d-flex justify-content-center container-loader">
+                    <flower-spinner class="loading-component" :animation-duration="2000" :size="30" color="#06C755" />
+                </div>
+                <div v-if="!isLoadingHistory">
+                    <HistoryChat v-for="(chat, index) in chats" :nth="index" :key="index" :chat="chat" />
+                </div>
                 <TypedText v-for="(text, index) in texts" :nth="index" :key="index" :content="text" />
             </div>
         </div>
-        <div v-if="texts.length == 0" class="intro-search">
+        <div v-if="texts.length == 0 && chats.length == 0" class="intro-search">
             <i class="fa-solid fa-lightbulb"></i> Search information, signs and treatment solutions for your disease on
             the system !
         </div>
@@ -37,6 +43,7 @@
 <script>
 import config from '@/config';
 import UserRequest from '@/restful/UserRequest';
+import HistoryChat from '@/components/user/chat/HistoryChat.vue';
 import TypedText from '@/components/user/chat/TypedText.vue';
 import { FlowerSpinner } from 'epic-spinners';
 
@@ -44,43 +51,92 @@ export default {
     name: "SearchPage",
     components: {
         TypedText,
-        FlowerSpinner
+        HistoryChat,
+        FlowerSpinner,
     },
     data() {
         return {
             isLoading: false,
+            isLoadingHistory: false,
             config: config,
             searchQuery: '',
+            chats: [],
             texts: []
         }
     },
     mounted() {
         this.$emitEvent('eventTitleHeader', 'Chat Bot');
         document.title = "Chat Bot | Knowledge Advanced";
+        this.getHistoryChat();
+    },
+    updated() {
+        this.scrollToBottom();
     },
     methods: {
-        // với cách này đã cải thiện tốc độ gõ 
-        async searchPaper() {
+        async getHistoryChat() {
+            this.isLoadingHistory = true;
+            try {
+                var { data } = await UserRequest.get('chatbot/history/');
+                this.chats = data;
+                this.isLoadingHistory = false;
+            }
+            catch (error) {
+                this.isLoadingHistory = false;
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
+            }
+        },
+        async searchPaper() { // với cách này đã cải thiện tốc độ gõ 
             this.isLoading = true;
             try {
                 var dataSubmit = {
                     question: this.searchQuery,
                 };
-                this.texts.push({ type: 'question', contentvalue: this.searchQuery });
+                var question_id = `typed-text-${Math.random().toString(36).substr(2, 9)}`
+                this.texts.push(
+                    { 
+                        type: 'question', 
+                        contentvalue: {
+                            'question_content' : this.searchQuery,
+                            'question_id' : question_id,
+                        }
+                    },
+                );
                 this.searchQuery = '';
-                var { answer } = await UserRequest.post('chatbotv2/', dataSubmit);
-                console.log(answer);
-                // this.texts.push({ type: 'question', contentvalue: this.searchQuery});
-                this.addResultsSequentially(answer);
+                const { data } = await UserRequest.post('chatbot/', dataSubmit);
+                this.addResultsSequentially(data.answer, data.cypher, question_id);
+                this.addNewChat(dataSubmit.question, data.answer);
                 this.$emitEvent('eventSuccess', 'Search success !');
                 this.isLoading = false;
-            } catch {
+            }
+            catch (error) {
                 this.isLoading = false;
-                this.$emitEvent('eventError', 'Search fail !');
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
             }
         },
-        async addResultsSequentially(results) {
-            this.texts.push({ type: 'result', contentvalue: results });
+        async addNewChat(question, answer) {
+            try {
+                var dataSubmit = {
+                    question: question,
+                    answer: answer,
+                };
+                const { data } = await UserRequest.post('chatbot/create_new/', dataSubmit);
+                console.log(data);
+            }
+            catch (error) {
+                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
+            }
+        },
+        async addResultsSequentially(answer, cypher, id_question) {
+            this.texts.push(
+                { 
+                    type: 'result', 
+                    contentvalue: {
+                        'answer' : answer, 
+                        'cypher' : cypher,
+                        'id_question' : id_question
+                    }
+                }
+            );
             for (var i = 1; i < 10; i++) {
                 await this.wait(500);
                 this.scrollToBottom();
@@ -94,7 +150,7 @@ export default {
                 const container = this.$el.querySelector('.container-result');
                 container.scrollTop = container.scrollHeight;
             });
-        }
+        },
     }
 }
 </script>

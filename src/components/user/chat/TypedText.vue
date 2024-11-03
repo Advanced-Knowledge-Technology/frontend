@@ -1,18 +1,33 @@
 <template>
   <div class="container-question" v-if="content.type == 'question'">
-    <p class="additional-content"><i class="fa-solid fa-circle-question"></i> {{ content.contentvalue }}</p>
+    <p type="button" data-toggle="modal" :data-target="'#' + content.contentvalue.question_id"
+      class="additional-content"><i class="fa-solid fa-circle-question"></i> {{ content.contentvalue.question_content }}
+    </p>
   </div>
-  <div v-if="content.type == 'result'" :id="typedId" class="paper-details">
+  <div v-if="content.type == 'result'" class="paper-details">
+    <!-- Modal -->
+    <div class="modal fade" :id="content.contentvalue.id_question" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"><strong>Cypher</strong></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body text-success">
+            {{ content.contentvalue.cypher }}
+          </div>
+        </div>
+      </div>
+    </div>
     <p><span :ref="'title' + nth"></span></p>
   </div>
 </template>
 
 <script>
 import TypeIt from "typeit";
-// const { emitEvent } = useEventBus();
-
-// import useEventBus from '@/composables/useEventBus';
-
 export default {
   name: "TypedText",
   props: {
@@ -21,7 +36,7 @@ export default {
   },
   data() {
     return {
-      typedId: `typed-text-${Math.random().toString(36).substr(2, 9)}`
+
     };
   },
   mounted() {
@@ -32,7 +47,7 @@ export default {
   },
   methods: {
     showResultDetails() {
-      new TypeIt(this.$refs['title' + this.nth], { speed: 1, lifelike: true, cursor: false }).type(this.content.contentvalue).go();
+      new TypeIt(this.$refs['title' + this.nth], { speed: 1, lifelike: true, cursor: false }).type(this.content.contentvalue.answer).go();
     },
   }
 };
@@ -132,7 +147,7 @@ export default {
 }
 
 .modal-dialog {
-    max-width: 500px;
+  max-width: 500px;
 }
 
 .container-keywords {
