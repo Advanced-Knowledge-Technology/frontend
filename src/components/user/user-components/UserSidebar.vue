@@ -27,7 +27,7 @@
           </span>
           <span>
             <li>
-              <router-link class="links" data-path="search" :to="{ name: 'SearchPage' }"><i class="fa-solid fa-robot"></i><span class="links_name">Chat bot</span></router-link>
+              <router-link class="links" data-path="chat-bot" :to="{ name: 'SearchPage' }"><i class="fa-solid fa-robot"></i><span class="links_name">Chat bot</span></router-link>
             </li>
           </span>
           <!-- <span :class="{ 'hide': user.role != 'manager' }">

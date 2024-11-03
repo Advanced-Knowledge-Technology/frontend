@@ -7,6 +7,7 @@ const { emitEvent } = useEventBus();
 
 // user 
 import UserLogin from '@/components/user/auth/UserLogin'
+import UserRegister from '@/components/user/auth/UserRegister'
 import UserMain from '@/components/user/UserMain'
 import ManageFolder from '@/components/user/manage-folder/ManageFolder'
 import ManageFile from '@/components/user/manage-file/ManageFile'
@@ -25,7 +26,7 @@ import CommonNotFound from '@/components/common/CommonNotFound'
 
 // middleware authUser
 const authUser = (to, from, next) => {
-    const user = localStorage.getItem('user');
+    const user = JSON.parse(localStorage.getItem('user'));
     if (user) next();
     else {
         next({ name: 'UserLogin' });
@@ -46,8 +47,19 @@ const authUser = (to, from, next) => {
 // check user logged 
 const loggedUser = (to, from, next) => {
     const user = localStorage.getItem('user');
-    if (user) next({ name: 'ManageFile' });
+    if (user) next({ name: 'SearchPage' });
     else next();
+};
+
+// middleware roleAdmin
+const roleAdmin = (to, from, next) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.role === 'admin') {
+        next();
+    } else {
+        next({ name: 'UserLogin' });
+        emitEvent('eventError', 'You have no rights !');
+    }
 };
 
 // // check amdin logged 
@@ -60,6 +72,7 @@ const loggedUser = (to, from, next) => {
 const routes = [
 
     { path: '/login', component: UserLogin, name: 'UserLogin', beforeEnter: loggedUser },
+    { path: '/register', component: UserRegister, name: 'UserRegister', beforeEnter: loggedUser },
     // { path: '/reset-password', component: UserResetPassword, name: 'UserResetPassword', beforeEnter: loggedUser },
     {
         path: '/dashboard',
@@ -67,9 +80,9 @@ const routes = [
         name: 'UserMain',
         beforeEnter: authUser,
         children: [
-            { path: 'manage-folder', name: 'ManageFolder', component: ManageFolder },
-            { path: 'manage-file', name: 'ManageFile', component: ManageFile },
-            { path: 'graph-database', name: 'GraphDatabase', component: GraphDatabase },
+            { path: 'manage-folder', name: 'ManageFolder', component: ManageFolder, beforeEnter: roleAdmin },
+            { path: 'manage-file', name: 'ManageFile', component: ManageFile, beforeEnter: roleAdmin },
+            { path: 'graph-database', name: 'GraphDatabase', component: GraphDatabase, beforeEnter: roleAdmin },
             { path: 'chat-bot', name: 'SearchPage', component: SearchPage },
             // { path: 'manage-content', name: 'ManageContent', component: ManageContent },
             // { path: 'manage-broadcast', name: 'ManageBroadcast', component: ManageBroadcast },

@@ -23,13 +23,13 @@
                                                 placeholder="Select folder" :close-on-select="true"
                                                 :searchable="true" :create-option="false" :options="folders" />
                                         </div>
-                                        <span v-if="errors.id_folder" id="add_file_errors_id_folder" class="text-danger">{{ errors.id_folder }}<br></span>
+                                        <span v-if="errors.id_folder" id="add_file_errors_id_folder" class="text-danger">{{ errors.id_folder[0] }}<br></span>
                                     </div>
                                     <div class="form-group">
                                         <label>File name</label>
                                         <input name="update_file_name" v-model="record.name" type="text" class="form-control form-control-sm" id="exampleInputEmail1"
                                             aria-describedby="emailHelp" placeholder="Tên Chapter">
-                                        <span id="update_file_errors_name" v-if="errors.name" class="text-danger">{{ errors.name }}<br></span>
+                                        <span id="update_file_errors_name" v-if="errors.name" class="text-danger">{{ errors.name[0] }}<br></span>
                                     </div>
                                     <button type="submit" class="mt-4 btn-pers" id="file_save_button"><i class="fa-solid fa-paper-plane"></i> Update</button>
                                 </form>

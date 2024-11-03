@@ -28,7 +28,7 @@
                                         <label>Folder name</label>
                                         <input name="update_folder_name" v-model="record.name" type="text" class="form-control form-control-sm" id="exampleInputEmail1"
                                             aria-describedby="emailHelp" placeholder="Folder Name">
-                                        <span id="update_folder_errors_name" v-if="errors.name" class="text-danger">{{ errors.name }}<br></span>
+                                        <span id="update_folder_errors_name" v-if="errors.name" class="text-danger">{{ errors.name[0] }}<br></span>
                                     </div>
                                     <button type="submit" class="mt-4 btn-pers" id="folder_save_button"><i class="fa-solid fa-paper-plane"></i> Update</button>
                                 </form>

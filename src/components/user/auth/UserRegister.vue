@@ -9,10 +9,18 @@
 			<br><br>
 			<div id="big">
 				<div class="container">
-					<form @submit.prevent="login()">
-						<h4>Knowledge Login </h4><br>
+					<form @submit.prevent="register()">
+						<h4>Knowledge Register </h4><br>
 						<div class="input-form">
-							<input name="username" v-model="loginUser.username" required>
+							<input name="email" v-model="registerUser.email" required>
+							<div class="underline"></div>
+							<label><i class="fa-solid fa-envelope"></i> Email</label>
+						</div>
+						<span v-if="errors.email" class="text-danger">{{ errors.email[0] }}</span>
+						<br>
+						<br>
+						<div class="input-form">
+							<input name="username" v-model="registerUser.username" required>
 							<div class="underline"></div>
 							<label><i class="fa-solid fa-user"></i> Username</label>
 						</div>
@@ -21,29 +29,45 @@
 						<br>
 						<div class="input-form">
 							<input name="password" required id="inputPassword" :type="isShow ? 'text' : 'password'"
-								v-model="loginUser.password">
+								v-model="registerUser.password">
 							<strong id="iconEye"><i @click="isShow = !isShow"
 									:class="{ 'fa-solid': true, 'fa-eye': !isShow, 'fa-eye-slash': isShow }"></i></strong>
 							<div class="underline"></div><label><i class="fa-solid fa-lock"></i> Password</label>
 						</div>
 						<span v-if="errors.password" class="text-danger">{{ errors.password[0] }}</span>
 						<br>
-						<a class="under" style="text-decoration: none;color: var(--user-color);cursor: pointer;" @click="gotoRegister()" >Register account ? </a><br>
+						<br>
+						<div class="input-form">
+							<input name="first_name" v-model="registerUser.first_name" required>
+							<div class="underline"></div>
+							<label><i class="fa-solid fa-signature"></i> First Name</label>
+						</div>
+						<span v-if="errors.first_name" class="text-danger">{{ errors.first_name[0] }}</span>
+						<br>
+						<br>
+						<div class="input-form">
+							<input name="last_name" v-model="registerUser.last_name" required>
+							<div class="underline"></div>
+							<label><i class="fa-solid fa-signature"></i> Last Name</label>
+						</div>
+						<span v-if="errors.last_name" class="text-danger">{{ errors.last_name[0] }}</span>
+						<br>
+						<a class="under" style="text-decoration: none;color: var(--user-color);cursor: pointer;" @click="gotoLogin()" >Log in to the system ?</a><br>
 
 						<button type="submit" class="mt-4 btn-pers" id="login_button"><i
-								class="fa-solid fa-arrow-right-to-bracket"></i> Login</button>
+								class="fa-solid fa-user-plus"></i> Rgister</button>
 					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
-  
+
 <script>
 import UserRequest from '@/restful/UserRequest'
 
 export default {
-	name: "UserLogin",
+	name: "UserRegister",
 	data() {
 		return {
 			user: {
@@ -53,19 +77,25 @@ export default {
 				first_name: null,
 				last_name: null,
 				access_token: null,
-                role: null,
+				role: null,
 			},
 			isShow: false,
-			loginUser: {
-				username: 'admin',
-				password: 'admin'
+			registerUser: {
+				email: null,
+				username: null,
+				password: null,
+				first_name: null,
+				last_name: null,
 			},
 			resetPassword: {
 				email: ''
 			},
 			errors: {
+				email: null,
 				username: null,
-				password: null
+				password: null,
+				first_name: null,
+				last_name: null,
 			}
 		}
 	},
@@ -77,23 +107,20 @@ export default {
 		appMain.style.paddingLeft = '0px'
 	},
 	methods: {
-		login: async function () {
+		register: async function () {
 			try {
-				const { data, messages } = await  UserRequest.post('user/login/', this.loginUser, true)
-				this.user = data.user;
-				this.user.access_token = data.token.access;
-				window.localStorage.setItem('user', JSON.stringify(this.user));
+				const { messages } = await UserRequest.post('user/register/', this.registerUser, true)
 				this.$emitEvent('eventSuccess', messages[0]);
-				this.$router.push({ name: 'SearchPage' }); 
+				this.$router.push({ name: 'UserLogin' });
 			}
-            catch (error) {
-                if (error.errors) this.errors = error.errors;
-                else for (let key in this.errors) this.errors[key] = null;
-                if (error.messages) this.$emitEvent('eventError', error.messages[0]);
+			catch (error) {
+				if (error.errors) this.errors = error.errors;
+				else for (let key in this.errors) this.errors[key] = null;
+				if (error.messages) this.$emitEvent('eventError', error.messages[0]);
 			}
 		},
-		gotoRegister: function() {
-			this.$router.push({ name: 'UserRegister' }); 
+		gotoLogin: function() {
+			this.$router.push({ name: 'UserLogin' }); 
 		},
 	},
 }
@@ -351,7 +378,7 @@ body {
 	justify-content: center;
 	display: flex;
 	position: relative;
-	margin-top: 100px;
+	margin-top: -10px;
 }
 
 .btn-pers {
@@ -417,9 +444,7 @@ body {
 	padding-right: 26px;
 }
 
-#input-font-size{
+#input-font-size {
 	font-size: 16px !important;
 }
 </style>
-  
-  

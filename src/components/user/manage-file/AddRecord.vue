@@ -23,13 +23,13 @@
                                                 placeholder="Select folder" :close-on-select="true"
                                                 :searchable="true" :create-option="false" :options="folders" />
                                         </div>
-                                        <span v-if="errors.id_folder" id="add_file_errors_id_folder" class="text-danger">{{ errors.id_folder }}<br></span>
+                                        <span v-if="errors.id_folder" id="add_file_errors_id_folder" class="text-danger">{{ errors.id_folder[0] }}<br></span>
                                     </div>
                                     <div class="form-group">
                                         <label>File Upload</label><br>
                                         <input type="file" ref="fileInput" id="file" @change="handleFileUpload" accept=".txt,.docx,.doc,.pdf" />
                                         <br>
-                                        <span v-if="errors.file" id="add_file_errors_name" class="text-danger">{{ errors.file }}<br></span>
+                                        <span v-if="errors.file" id="add_file_errors_name" class="text-danger">{{ errors.file[0] }}<br></span>
                                     </div>
                                     <button type="submit" class="mt-4 btn-pers" id="file_add_button"><i class="fa-solid fa-plus"></i> Add</button>
                                 </form>
@@ -58,7 +58,7 @@ export default {
         return {
             selectedFile: null,
             record: {
-                id_folder: null,
+                id_folder: 9999999999999999,
                 file: null,
             },
             errors: {

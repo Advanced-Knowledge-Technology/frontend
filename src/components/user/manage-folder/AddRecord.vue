@@ -28,7 +28,7 @@
                                         <label><i class="fa-solid fa-folder"></i> Folder name</label>
                                         <input name="add_folder_name" v-model="record.name" type="text" class="form-control form-control-sm" id="exampleInputEmail1"
                                             aria-describedby="emailHelp" placeholder="Name Folder">
-                                        <span v-if="errors.name" class="text-danger" id="add_folder_errors_name">{{ errors.name }}<br></span>
+                                        <span v-if="errors.name" class="text-danger" id="add_folder_errors_name">{{ errors.name[0] }}<br></span>
                                     </div>
                                     <button type="submit" class="mt-4 btn-pers" id="folder_add_button"><i class="fa-solid fa-plus"></i> Add</button>
                                 </form>
